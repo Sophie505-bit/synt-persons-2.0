@@ -12,7 +12,7 @@ from src.priors import compute_real_priors
 
 
 def run_pipeline(
-    data_file: str,
+    data_file: str = "itmo_qa (3) - 8000 респондентов.xlsx",
     n: int = 1000,
     output_dir: str = "data",
     scenario_text: Optional[str] = None,
@@ -34,7 +34,6 @@ def run_pipeline(
     embeddings = [p.embedding for p in personas if p.embedding]
     neighbors = build_knn_graph(embeddings, k=10) if len(embeddings) == len(personas) else {}
 
-    # FIX: передаём список + схему, а не путь к файлу
     priors = compute_real_priors(real_answers, schema)
     sim = Simulator("configs/survey_schema.yaml", priors=priors)
 
