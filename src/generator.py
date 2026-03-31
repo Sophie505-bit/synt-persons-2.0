@@ -26,7 +26,6 @@ def pick_archetype(archetypes: List[Archetype], demo: DemographicProfile, rng: r
         p_social += 0.05
     if "высок" in inc or "достаточн" in inc:
         p_optimist += 0.08
-
     if age < 30:
         p_social += 0.15
         p_lowtech = 0.02
@@ -45,7 +44,6 @@ def pick_archetype(archetypes: List[Archetype], demo: DemographicProfile, rng: r
     cumul += min(0.25, p_social)
     if r < cumul:
         return a.get("a3", archetypes[2 % len(archetypes)])
-
     return rng.choice(archetypes)
 
 
@@ -64,17 +62,13 @@ def sample_demographics(df: pd.DataFrame, n: int) -> List[DemographicProfile]:
 
 
 def build_narrative(archetype: Archetype, demo: DemographicProfile, behaviors: dict, rng: random.Random) -> str:
-    """Строит РУССКИЙ нарратив из архетипа + демографии + поведения."""
     phrase = rng.choice(archetype.signature_phrases) if archetype.signature_phrases else ""
     parts = []
-
     parts.append(f"{demo.gender}, {demo.age} лет, район {demo.region}.")
     parts.append(f"Доход: {demo.income}. Образование: {demo.education}.")
     parts.append(f"Архетип: {archetype.name} — {archetype.description}.")
-
     if phrase:
-        parts.append(f'Характерная фраза: «{phrase}».')
-
+        parts.append(f"Характерная фраза: \"{phrase}\".")
     extras = []
     if behaviors.get("privacy_concern", 0.5) > 0.65:
         extras.append("с осторожностью относится к сбору персональных данных")
@@ -88,10 +82,8 @@ def build_narrative(archetype: Archetype, demo: DemographicProfile, behaviors: d
         extras.append("решения ИИ скорее перепроверит")
     elif behaviors.get("trust_in_ai", 0.5) > 0.65:
         extras.append("доверяет рекомендациям ИИ")
-
     if extras:
         parts.append(" ".join(e.capitalize() + "." for e in extras))
-
     return " ".join(parts)
 
 
@@ -105,19 +97,15 @@ def generate_population_archetypes(
     progress_callback: Optional[Callable[[int, int, PersonaProfile], None]] = None,
 ) -> List[PersonaProfile]:
     os.makedirs(os.path.dirname(output_file) or "data", exist_ok=True)
-
     rng = random.Random(seed)
     archetypes = generate_archetypes(k=k_archetypes, output_dir=(os.path.dirname(output_file) or "data"))
     demos = sample_demographics(df, n=n)
-
     personas: List[PersonaProfile] = []
     narratives: List[str] = []
-
     for i, demo in enumerate(demos):
         arch = pick_archetype(archetypes, demo, rng)
         behaviors = sample_behaviors(arch, rng=rng)
         narrative = build_narrative(arch, demo, behaviors, rng)
-
         p = PersonaProfile(
             persona_id=str(uuid.uuid4()),
             demographics=demo,
@@ -128,18 +116,13 @@ def generate_population_archetypes(
         )
         personas.append(p)
         narratives.append(narrative)
-
         if progress_callback:
             progress_callback(i + 1, n, p)
-
-    # embeddings батчом
     embedder = Embedder(model_name=embed_model)
     vecs = embedder.embed_texts(narratives)
     for p, v in zip(personas, vecs):
         p.embedding = v
-
     with open(output_file, "w", encoding="utf-8") as f:
         for p in personas:
             f.write(p.model_dump_json() + "\n")
-
     return personas

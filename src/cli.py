@@ -14,16 +14,11 @@ def run_pipeline_cmd(
     seed: int = typer.Option(42, "--seed"),
 ):
     from src.pipeline import run_pipeline
-
     scenario_text = None
     if scenario_file:
         with open(scenario_file, "r", encoding="utf-8") as f:
             scenario_text = f.read()
-
-    result = run_pipeline(
-        data_file=data_file, n=n, output_dir=output_dir,
-        scenario_text=scenario_text, seed=seed,
-    )
+    result = run_pipeline(data_file=data_file, n=n, output_dir=output_dir, scenario_text=scenario_text, seed=seed)
     print("pipeline done")
     print(json.dumps(result["metrics_real"], ensure_ascii=False, indent=2))
 

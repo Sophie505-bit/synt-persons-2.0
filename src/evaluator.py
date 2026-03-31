@@ -23,8 +23,7 @@ class Evaluator:
             agg[q.question_id] = {k: v / n for k, v in counts.items()}
         return agg
 
-    def compute_tvd(self, dist_a: Dict[str, float], dist_b: Dict[str, float],
-                    option_ids: List[str]) -> float:
+    def compute_tvd(self, dist_a, dist_b, option_ids):
         return 0.5 * sum(abs(dist_a.get(oid, 0) - dist_b.get(oid, 0)) for oid in option_ids)
 
     def compare(self, real_answers, synth_answers, output_dir="data"):

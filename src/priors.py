@@ -3,11 +3,9 @@ from src.schema import SurveySchema
 
 
 def compute_real_priors(real_answers: List[Dict[str, Any]], schema: SurveySchema) -> Dict[str, Dict[str, float]]:
-    """Считает доли выбора каждого варианта по реальным ответам."""
     n = len(real_answers)
     if n == 0:
         return {}
-
     priors = {}
     for q in schema.questions:
         counts = {opt.id: 0 for opt in q.options}
@@ -22,7 +20,6 @@ def compute_real_priors(real_answers: List[Dict[str, Any]], schema: SurveySchema
 
 
 def priors_to_text(priors: Dict[str, Dict[str, float]], top_k: int = 5) -> str:
-    """Форматирует priors в текст для промпта."""
     lines = []
     for qid, dist in priors.items():
         top = sorted(dist.items(), key=lambda x: -x[1])[:top_k]

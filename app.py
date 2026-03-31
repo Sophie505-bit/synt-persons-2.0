@@ -7,7 +7,6 @@ import plotly.express as px
 
 st.set_page_config(page_title="Synthetic Respondents", layout="wide")
 
-# ── sidebar ──
 st.sidebar.title("Settings")
 api_key = st.sidebar.text_input("API key", value=os.environ.get("OPENAI_API_KEY", ""), type="password")
 if api_key:
@@ -62,30 +61,30 @@ def load_survey_schema():
     return load_schema(schema_path)
 
 
-# ── tabs ──
 tab1, tab2, tab3, tab4 = st.tabs(["Real Data", "Generation", "Survey", "Evaluation"])
 
-# ── TAB 1: real data ──
+# ── TAB 1 ──
 with tab1:
     st.header("Real Data Overview")
     if not os.path.exists(data_file):
         st.warning(f"File not found: {data_file}")
     else:
-        summary, _ = load_real_data(data_file)
+        with st.spinner("Loading real data..."):
+            summary, _ = load_real_data(data_file)
         c1, c2, c3 = st.columns(3)
         c1.metric("Total respondents", summary["total"])
         c2.metric("Mean age", f"{summary['age_mean']:.1f}")
         c3.metric("Std age", f"{summary['age_std']:.1f}")
 
         gender_df = pd.DataFrame(list(summary["gender_dist"].items()), columns=["Gender", "Count"])
-        st.plotly_chart(px.pie(gender_df, values="Count", names="Gender", title="Gender distribution"),
-                        use_container_width=True)
+        fig_gender = px.pie(gender_df, values="Count", names="Gender", title="Gender distribution")
+        st.plotly_chart(fig_gender, key="gender_pie")
 
         st.subheader("Income distribution")
         inc_df = pd.DataFrame(list(summary["income_dist"].items()), columns=["Income", "Count"])
-        st.dataframe(inc_df, use_container_width=True)
+        st.dataframe(inc_df)
 
-# ── TAB 2: generate ──
+# ── TAB 2 ──
 with tab2:
     st.header("Population Generation")
     n_personas = st.slider("Number of personas", 10, 1000, 100, 10)
@@ -101,7 +100,6 @@ with tab2:
                         _test = json.load(_f)
                     if _test and isinstance(_test[0].get("name", ""), str) and _test[0]["name"].isascii():
                         os.remove(cache_path)
-                        st.info("Removed old archetypes cache (was in English)")
                 except Exception:
                     pass
 
@@ -110,18 +108,18 @@ with tab2:
 
             loader = DataLoader(data_file)
             df = loader.get_joint_distribution()
-            progress = st.progress(0)
+            progress = st.progress(0, text="Generating personas...")
             status = st.empty()
 
             def on_progress(cur, total, p):
-                progress.progress(cur / total)
-                status.text(f"Generating: {cur}/{total}")
+                progress.progress(cur / total, text=f"Generating: {cur}/{total}")
 
             with st.spinner("Generating population..."):
                 results = generate_population_archetypes(
                     df, n=n_personas, output_file=POPULATION_FILE,
                     progress_callback=on_progress
                 )
+            progress.progress(1.0, text="Done!")
             st.success(f"Created {len(results)} profiles")
 
     personas = load_personas(POPULATION_FILE)
@@ -142,7 +140,7 @@ with tab2:
                 st.write(p.narrative)
                 st.json(p.behaviors)
 
-# ── TAB 3: survey ──
+# ── TAB 3 ──
 with tab3:
     st.header("Survey")
     personas = load_personas(POPULATION_FILE)
@@ -167,34 +165,34 @@ with tab3:
             from src.priors import compute_real_priors
             from src.graph_builder import build_knn_graph
 
-            _, real_answers = load_real_data(data_file)
-            survey_schema = load_survey_schema()
-            priors = compute_real_priors(real_answers, survey_schema)
+            with st.spinner("Loading real data for calibration..."):
+                _, real_answers = load_real_data(data_file)
+                survey_schema = load_survey_schema()
+                priors = compute_real_priors(real_answers, survey_schema)
 
             selected_personas = personas[:n_survey]
             embeddings = [p.embedding for p in selected_personas if p.embedding]
             neighbors = {}
             if len(embeddings) == len(selected_personas) and len(selected_personas) > 1:
-                neighbors = build_knn_graph(embeddings, k=min(10, len(selected_personas) - 1))
+                with st.spinner("Building neighbor graph..."):
+                    neighbors = build_knn_graph(embeddings, k=min(10, len(selected_personas) - 1))
 
             sim = Simulator(schema_path, priors=priors)
-            progress = st.progress(0)
-            status = st.empty()
+            progress = st.progress(0, text="Surveying personas...")
 
             def on_survey_progress(cur, total):
-                progress.progress(cur / total)
-                status.text(f"Surveying: {cur}/{total}")
+                progress.progress(cur / total, text=f"Surveying: {cur}/{total}")
 
-            with st.spinner("Running survey..."):
-                results = sim.run_survey(
-                    selected_personas,
-                    scenario=scenario_text,
-                    neighbors_graph=neighbors,
-                    progress_callback=on_survey_progress,
-                )
+            results = sim.run_survey(
+                selected_personas,
+                scenario=scenario_text,
+                neighbors_graph=neighbors,
+                progress_callback=on_survey_progress,
+            )
 
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(results, f, ensure_ascii=False, indent=2)
+            progress.progress(1.0, text="Done!")
             st.success(f"Surveyed {len(results)} personas -> {output_file}")
 
         results = load_results(output_file)
@@ -208,16 +206,16 @@ with tab3:
                         if sid in option_counts:
                             option_counts[sid] += 1
                 chart_data = pd.DataFrame([
-                    {"option": f"{opt.id}", "share": option_counts[opt.id] / len(results)}
+                    {"option": opt.id, "share": option_counts[opt.id] / len(results)}
                     for opt in q.options
                 ])
                 fig = px.bar(chart_data, x="share", y="option", orientation="h",
                              title=f"{q.question_id}: {q.text[:70]}...",
                              height=max(250, len(q.options) * 28))
                 fig.update_layout(xaxis_range=[0, 1])
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, key=f"survey_{q.question_id}")
 
-# ── TAB 4: evaluate ──
+# ── TAB 4 ──
 with tab4:
     st.header("Evaluation")
 
@@ -251,7 +249,7 @@ with tab4:
                 fig.add_trace(go.Bar(name="synthetic", x=option_ids, y=synth_vals, marker_color="#DD8452"))
                 fig.update_layout(title=f"{qid} — TVD: {tvd:.3f}", barmode="group",
                                   yaxis_range=[0, 1], height=350)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, key=f"eval_{qid}")
 
             st.subheader("TVD Summary")
             st.table(pd.DataFrame(metrics))
@@ -285,10 +283,10 @@ with tab4:
                 fig.add_trace(go.Bar(name="scenario", x=option_ids, y=scen_vals, marker_color="#C44E52"))
                 fig.update_layout(title=f"{qid} — TVD: {tvd:.3f}", barmode="group",
                                   yaxis_range=[0, 1], height=350)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, key=f"scen_{qid}")
 
                 colors = ["green" if d >= 0 else "red" for d in diff_vals]
                 fig_delta = go.Figure()
                 fig_delta.add_trace(go.Bar(x=option_ids, y=diff_vals, marker_color=colors))
                 fig_delta.update_layout(title=f"{qid} — delta (scenario - baseline)", height=250)
-                st.plotly_chart(fig_delta, use_container_width=True)
+                st.plotly_chart(fig_delta, key=f"delta_{qid}")

@@ -16,50 +16,49 @@ class Archetype(BaseModel):
     signature_phrases: List[str] = Field(default_factory=list)
 
 
-# ---- РУССКИЕ fallback-архетипы (20 штук) ----
 FALLBACK_ARCHETYPES: List[Archetype] = [
     Archetype(archetype_id="a1", name="цифровой энтузиаст",
-              description="активно использует все цифровые сервисы, первым пробует новинки, верит что технологии улучшают жизнь",
+              description="активно использует все цифровые сервисы, первым пробует новинки",
               traits={"tech_optimism": 0.92, "privacy_concern": 0.25, "internet_activity": 0.90, "trust_in_ai": 0.82},
               signature_phrases=["технологии — это будущее", "чем больше цифры, тем лучше"]),
     Archetype(archetype_id="a2", name="защитник приватности",
-              description="ценит личные данные превыше удобства, скептичен к сбору информации, пользуется VPN",
+              description="ценит личные данные превыше удобства, скептичен к сбору информации",
               traits={"tech_optimism": 0.40, "privacy_concern": 0.92, "internet_activity": 0.55, "trust_in_ai": 0.20},
               signature_phrases=["мои данные — моё дело", "не доверяю тем, кто собирает информацию"]),
     Archetype(archetype_id="a3", name="соцсетевой активист",
-              description="живёт в соцсетях и мессенджерах, постоянно на связи, делится контентом",
+              description="живёт в соцсетях и мессенджерах, постоянно на связи",
               traits={"tech_optimism": 0.72, "privacy_concern": 0.38, "internet_activity": 0.95, "trust_in_ai": 0.55},
               signature_phrases=["я всегда онлайн", "новости узнаю из телеграма"]),
     Archetype(archetype_id="a4", name="цифровой минималист",
-              description="сознательно ограничивает время онлайн, использует только необходимые сервисы",
+              description="сознательно ограничивает время онлайн, только необходимые сервисы",
               traits={"tech_optimism": 0.35, "privacy_concern": 0.75, "internet_activity": 0.30, "trust_in_ai": 0.30},
               signature_phrases=["меньше экранов — больше жизни", "цифровой детокс необходим"]),
     Archetype(archetype_id="a5", name="low-tech пользователь",
-              description="слабо разбирается в технологиях, нужна помощь, пользуется только базовыми функциями",
+              description="слабо разбирается в технологиях, нужна помощь",
               traits={"tech_optimism": 0.30, "privacy_concern": 0.50, "internet_activity": 0.18, "trust_in_ai": 0.22},
               signature_phrases=["мне сложно разобраться", "прошу внука помочь настроить"]),
     Archetype(archetype_id="a6", name="онлайн-покупатель",
-              description="активно покупает онлайн, ценит удобство доставки и маркетплейсов",
+              description="активно покупает онлайн, ценит удобство доставки",
               traits={"tech_optimism": 0.78, "privacy_concern": 0.45, "internet_activity": 0.72, "trust_in_ai": 0.62},
               signature_phrases=["зачем идти в магазин, если можно заказать", "маркетплейсы — это удобно"]),
     Archetype(archetype_id="a7", name="осторожный прагматик",
-              description="пользуется цифровыми сервисами по необходимости, взвешивает риски и пользу",
+              description="пользуется цифровыми сервисами по необходимости, взвешивает риски",
               traits={"tech_optimism": 0.55, "privacy_concern": 0.68, "internet_activity": 0.52, "trust_in_ai": 0.42},
-              signature_phrases=["если это удобно и безопасно — почему бы и нет", "сначала почитаю отзывы"]),
+              signature_phrases=["если удобно и безопасно — почему бы и нет", "сначала почитаю отзывы"]),
     Archetype(archetype_id="a8", name="цифровой скептик",
-              description="не доверяет цифровизации, считает что технологии создают больше проблем чем решают",
+              description="не доверяет цифровизации, считает что технологии создают проблемы",
               traits={"tech_optimism": 0.18, "privacy_concern": 0.85, "internet_activity": 0.28, "trust_in_ai": 0.15},
-              signature_phrases=["не всё нужно переводить в цифру", "раньше было лучше без этого"]),
+              signature_phrases=["не всё нужно переводить в цифру", "раньше было лучше"]),
     Archetype(archetype_id="a9", name="удалённый работник",
-              description="работает из дома, зависит от цифровых инструментов для работы и общения",
+              description="работает из дома, зависит от цифровых инструментов",
               traits={"tech_optimism": 0.75, "privacy_concern": 0.55, "internet_activity": 0.82, "trust_in_ai": 0.60},
               signature_phrases=["дом — мой офис", "без интернета работа встанет"]),
     Archetype(archetype_id="a10", name="геймер",
-              description="много времени проводит в играх и игровых сообществах, технически подкован",
+              description="много времени проводит в играх, технически подкован",
               traits={"tech_optimism": 0.80, "privacy_concern": 0.35, "internet_activity": 0.88, "trust_in_ai": 0.52},
               signature_phrases=["игры — мой способ отдыха", "в онлайне у меня свои сообщества"]),
     Archetype(archetype_id="a11", name="забота о здоровье",
-              description="использует приложения и гаджеты для отслеживания здоровья и фитнеса",
+              description="использует приложения и гаджеты для отслеживания здоровья",
               traits={"tech_optimism": 0.72, "privacy_concern": 0.58, "internet_activity": 0.60, "trust_in_ai": 0.58},
               signature_phrases=["фитнес-браслет всегда со мной", "технологии помогают следить за здоровьем"]),
     Archetype(archetype_id="a12", name="умный дом",
@@ -67,35 +66,35 @@ FALLBACK_ARCHETYPES: List[Archetype] = [
               traits={"tech_optimism": 0.88, "privacy_concern": 0.42, "internet_activity": 0.68, "trust_in_ai": 0.72},
               signature_phrases=["управляю всем со смартфона", "умный дом экономит время"]),
     Archetype(archetype_id="a13", name="онлайн-ученик",
-              description="активно учится онлайн, проходит курсы, смотрит образовательный контент",
+              description="активно учится онлайн, проходит курсы",
               traits={"tech_optimism": 0.82, "privacy_concern": 0.38, "internet_activity": 0.78, "trust_in_ai": 0.65},
-              signature_phrases=["учиться можно где угодно", "онлайн-курсы — это доступное образование"]),
+              signature_phrases=["учиться можно где угодно", "онлайн-курсы — доступное образование"]),
     Archetype(archetype_id="a14", name="новостной маньяк",
-              description="постоянно читает новости из разных источников онлайн",
+              description="постоянно читает новости из разных источников",
               traits={"tech_optimism": 0.58, "privacy_concern": 0.52, "internet_activity": 0.75, "trust_in_ai": 0.45},
               signature_phrases=["нужно быть в курсе событий", "читаю новости из нескольких источников"]),
     Archetype(archetype_id="a15", name="создатель контента",
               description="создаёт и публикует свой контент: видео, тексты, подкасты",
               traits={"tech_optimism": 0.85, "privacy_concern": 0.40, "internet_activity": 0.92, "trust_in_ai": 0.55},
-              signature_phrases=["я делюсь своими идеями с миром", "контент — это мой способ самовыражения"]),
+              signature_phrases=["делюсь идеями с миром", "контент — мой способ самовыражения"]),
     Archetype(archetype_id="a16", name="городской исследователь",
-              description="использует технологии для навигации, поиска мест и городских сервисов",
+              description="использует технологии для навигации и поиска мест",
               traits={"tech_optimism": 0.68, "privacy_concern": 0.42, "internet_activity": 0.65, "trust_in_ai": 0.50},
               signature_phrases=["навигатор — мой лучший друг", "люблю находить новые места через приложения"]),
     Archetype(archetype_id="a17", name="эко-сознательный",
-              description="использует цифровые платформы для продвижения экологических инициатив",
+              description="использует цифровые платформы для продвижения экологии",
               traits={"tech_optimism": 0.62, "privacy_concern": 0.50, "internet_activity": 0.58, "trust_in_ai": 0.55},
-              signature_phrases=["технологии могут помочь планете", "через интернет продвигаю экологичный образ жизни"]),
+              signature_phrases=["технологии могут помочь планете", "продвигаю экологичный образ жизни"]),
     Archetype(archetype_id="a18", name="госуслуги-пользователь",
-              description="активно пользуется электронными госуслугами, оплатой ЖКХ, записью к врачу онлайн",
+              description="активно пользуется электронными госуслугами, оплатой ЖКХ",
               traits={"tech_optimism": 0.65, "privacy_concern": 0.60, "internet_activity": 0.62, "trust_in_ai": 0.48},
-              signature_phrases=["госуслуги онлайн — очень удобно", "всё можно сделать не выходя из дома"]),
+              signature_phrases=["госуслуги онлайн — удобно", "всё можно сделать не выходя из дома"]),
     Archetype(archetype_id="a19", name="тревожный пользователь",
-              description="пользуется технологиями но постоянно тревожится о безопасности и влиянии на психику",
+              description="пользуется технологиями но тревожится о безопасности",
               traits={"tech_optimism": 0.42, "privacy_concern": 0.78, "internet_activity": 0.55, "trust_in_ai": 0.30},
               signature_phrases=["переживаю за свои данные", "негативные новости портят настроение"]),
     Archetype(archetype_id="a20", name="общественник-организатор",
-              description="использует цифровые инструменты для организации сообществ и мероприятий",
+              description="использует цифровые инструменты для организации сообществ",
               traits={"tech_optimism": 0.75, "privacy_concern": 0.40, "internet_activity": 0.72, "trust_in_ai": 0.50},
               signature_phrases=["вместе мы можем больше", "организую мероприятия через соцсети"]),
 ]
@@ -124,7 +123,7 @@ def _cache_path(output_dir: str) -> str:
     return os.path.join(output_dir, "archetypes_cache.json")
 
 
-def load_cached_archetypes(output_dir: str = "data") -> "List[Archetype] | None":
+def load_cached_archetypes(output_dir="data"):
     path = _cache_path(output_dir)
     if os.path.exists(path):
         try:
@@ -135,13 +134,13 @@ def load_cached_archetypes(output_dir: str = "data") -> "List[Archetype] | None"
     return None
 
 
-def save_cached_archetypes(archetypes: "List[Archetype]", output_dir: str = "data") -> None:
+def save_cached_archetypes(archetypes, output_dir="data"):
     path = _cache_path(output_dir)
     with open(path, "w", encoding="utf-8") as f:
         json.dump([a.model_dump() for a in archetypes], f, ensure_ascii=False, indent=2)
 
 
-def generate_archetypes(k: int = 20, seed: int = 42, output_dir: str = "data") -> "List[Archetype]":
+def generate_archetypes(k: int = 20, seed: int = 42, output_dir: str = "data"):
     cached = load_cached_archetypes(output_dir=output_dir)
     if cached and len(cached) >= k:
         return cached[:k]
@@ -157,14 +156,13 @@ def generate_archetypes(k: int = 20, seed: int = 42, output_dir: str = "data") -
         ("system",
          "ты социолог. сгенерируй архетипы цифрового поведения российских горожан. "
          "ВСЕ тексты строго на РУССКОМ языке. "
-         "верни строго json (и ничего кроме json): список из k объектов. "
-         "поля: archetype_id (str), name (str, русский), description (str, русский), "
-         "traits (объект с ключами: tech_optimism, privacy_concern, internet_activity, trust_in_ai — числа 0..1), "
-         "signature_phrases (список из 2-3 фраз на русском)."),
-        ("user", "k={k}. archetype_id строго a1..a{k}. все на русском языке.")
+         "верни строго json: список из k объектов. "
+         "поля: archetype_id, name, description, traits, signature_phrases. "
+         "traits: tech_optimism, privacy_concern, internet_activity, trust_in_ai (0..1). "
+         "signature_phrases: 2-3 фразы на русском."),
+        ("user", "k={k}. archetype_id строго a1..a{k}. все на русском.")
     ])
 
-    last_err = None
     for attempt in range(3):
         try:
             raw = llm.invoke(prompt.format_messages(k=k)).content.strip()
@@ -173,28 +171,23 @@ def generate_archetypes(k: int = 20, seed: int = 42, output_dir: str = "data") -
                 end = raw.rfind("]")
                 if start != -1 and end != -1 and end > start:
                     raw = raw[start:end + 1]
-
             data = json.loads(raw)
             if not isinstance(data, list):
-                raise ValueError("not a json list")
-
+                raise ValueError("not a list")
             fixed = []
             for item in data[:k]:
                 if isinstance(item, dict):
                     item = _ensure_traits(item, rng)
                     fixed.append(Archetype(**item))
-
             if len(fixed) < k:
                 for fb in FALLBACK_ARCHETYPES:
                     if len(fixed) >= k:
                         break
                     if fb.archetype_id not in {a.archetype_id for a in fixed}:
                         fixed.append(fb)
-
             save_cached_archetypes(fixed, output_dir=output_dir)
             return fixed
-        except Exception as e:
-            last_err = e
+        except Exception:
             time.sleep(1.5 * (attempt + 1))
 
     save_cached_archetypes(FALLBACK_ARCHETYPES[:k], output_dir=output_dir)

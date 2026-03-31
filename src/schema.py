@@ -31,9 +31,9 @@ class DemographicProfile(BaseModel):
 class PersonaProfile(BaseModel):
     persona_id: str
     demographics: DemographicProfile
-    archetype_id: str = Field(default="a0", description="id архетипа")
+    archetype_id: str = Field(default="a0")
     behaviors: Dict[str, float] = Field(default_factory=dict)
-    narrative: str = Field(default="", description="нарратив")
+    narrative: str = Field(default="")
     embedding: Optional[List[float]] = None
 
 
