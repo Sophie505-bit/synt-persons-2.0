@@ -8,6 +8,7 @@ class Evaluator:
         self.schema = load_schema(schema_path)
 
     def aggregate_answers(self, answers: List[Dict[str, Any]]) -> Dict[str, Dict[str, float]]:
+        """Агрегирует ответы: для каждой опции доля респондентов, выбравших её."""
         n = len(answers)
         if n == 0:
             return {}
@@ -20,13 +21,22 @@ class Evaluator:
                     s_id = s.split(" ")[0] if " " in s else s
                     if s_id in counts:
                         counts[s_id] += 1
+            # Доля респондентов, выбравших опцию (вероятность выбора)
             agg[q.question_id] = {k: v / n for k, v in counts.items()}
         return agg
 
     def compute_tvd(self, dist_a, dist_b, option_ids):
-        return 0.5 * sum(abs(dist_a.get(oid, 0) - dist_b.get(oid, 0)) for oid in option_ids)
+        """
+        Бинарный TVD: среднее абсолютное различие вероятностей выбора каждой опции.
+        Результат в интервале [0, 2]. 0 — идентичные распределения, 2 — полное расхождение.
+        """
+        total_diff = 0.0
+        for oid in option_ids:
+            total_diff += abs(dist_a.get(oid, 0) - dist_b.get(oid, 0))
+        return total_diff / len(option_ids)
 
     def compare(self, real_answers, synth_answers, output_dir="data"):
+        """Сравнивает реальные и синтетические ответы."""
         os.makedirs(output_dir, exist_ok=True)
         real_agg = self.aggregate_answers(real_answers)
         synth_agg = self.aggregate_answers(synth_answers)
@@ -39,6 +49,7 @@ class Evaluator:
         return metrics
 
     def compare_synthetic(self, base_answers, scenario_answers, output_dir="data"):
+        """Сравнивает базовый и сценарный опросы."""
         os.makedirs(output_dir, exist_ok=True)
         base_agg = self.aggregate_answers(base_answers)
         scen_agg = self.aggregate_answers(scenario_answers)
