@@ -62,24 +62,33 @@ class Simulator:
         return result
 
     def survey_one(self, persona: PersonaProfile, scenario: str = "",
-                   neighbors_summary: str = "") -> Dict[str, Any]:
+                   neighbors_summary: str = "", use_priors: bool = True) -> Dict[str, Any]:
         if not self.use_llm:
             ans = self._dummy_answer_all()
             ans["persona_id"] = persona.persona_id
             return ans
 
-        priors_text = self._build_priors_text()
+        # ---- priors только если разрешено ----
+        priors_text = self._build_priors_text() if use_priors else ""
+
         questions_block = self._build_questions_block()
 
+        # ---- формируем промпт: сценарий в начале, с усилением ----
         scenario_part = ""
         if scenario:
-            scenario_part = f"\n\nСЦЕНАРИЙ (учти при ответах):\n{scenario}"
+            scenario_part = f"""ВАЖНО: Представь, что происходит следующая ситуация:
+{scenario}
+
+Твои ответы должны отражать твоё отношение именно в этих обстоятельствах.
+"""
+        else:
+            scenario_part = ""
 
         neighbors_part = ""
         if neighbors_summary:
             neighbors_part = f"\n\nМнения похожих людей:\n{neighbors_summary}"
 
-        prompt = f"""Ты — участник социологического опроса. Отвечай строго от лица описанного человека.
+        prompt = f"""{scenario_part}Ты — участник социологического опроса. Отвечай строго от лица описанного человека.
 
 ПРОФИЛЬ:
 Пол: {persona.demographics.gender}
@@ -89,10 +98,10 @@ class Simulator:
 Образование: {persona.demographics.education}
 Архетип: {persona.archetype_id}
 Признаки: tech_optimism={persona.behaviors.get('tech_optimism', 0.5):.2f}, privacy_concern={persona.behaviors.get('privacy_concern', 0.5):.2f}, internet_activity={persona.behaviors.get('internet_activity', 0.5):.2f}, trust_in_ai={persona.behaviors.get('trust_in_ai', 0.5):.2f}
-Описание: {persona.narrative}{scenario_part}{neighbors_part}
+Описание: {persona.narrative}{neighbors_part}
 
-СТАТИСТИКА реальных ответов:
 {priors_text}
+СТАТИСТИКА реальных ответов (если указана):
 
 ВОПРОСЫ:
 {questions_block}
@@ -124,7 +133,12 @@ class Simulator:
             neighbors_summary = ""
             if neighbors_graph and results and i in neighbors_graph:
                 neighbors_summary = self._make_neighbors_summary(neighbors_graph[i], results)
-            ans = self.survey_one(p, scenario=scenario, neighbors_summary=neighbors_summary)
+
+            # Если сценарий задан, отключаем priors
+            use_priors = not bool(scenario)   # True если нет сценария
+
+            ans = self.survey_one(p, scenario=scenario, neighbors_summary=neighbors_summary,
+                                  use_priors=use_priors)
             results.append(ans)
             if progress_callback:
                 progress_callback(i + 1, len(personas))
